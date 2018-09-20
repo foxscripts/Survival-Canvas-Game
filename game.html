@@ -1,0 +1,173 @@
+<html>
+<head>
+	<title> Test </title>
+	<style type="text/css">
+		body{
+			margin: 0px;
+		}
+		#mycanvas{
+			border: 1px solid #111;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="mycanvas">
+	</canvas>
+
+	
+
+<script type="text/javascript">
+
+	var canvas = document.getElementById('mycanvas');
+	var ctx = canvas.getContext("2d");
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+
+	alert("Survive !");
+
+	var player = {
+		x : 300,
+		y : 300,
+		dx : 50,
+		dy : 50,
+		width : 20,
+		height : 30,
+		color : 'blue',
+		life : 10,
+	};
+
+	var enemyList = {}
+
+	Enemy = function (x, y, dx, dy, id, width, height) {
+		var theEnemy = {
+			x : x,
+			y : y,
+			dx : dx,
+			dy : dy,
+			width : width,
+			height : height,
+			color : 'red',
+			id : id,
+		};
+		enemyList[id] = theEnemy;
+	}
+
+	//Mouse Interaction
+	
+	document.onmousemove = function (mouse) {
+		var mouseX  = mouse.clientX;
+		var mouseY = mouse.clientY;
+		player.x = mouseX;
+		player.y = mouseY;
+	}
+
+
+	update = function (entity) {
+		drawEnemy(entity);
+		updatePos(entity);
+	}
+
+	drawPlayer = function (entity) {
+		ctx.beginPath();
+		ctx.fillStyle = entity.color;
+		ctx.fillRect(entity.x, entity.y, entity.width, entity.height);
+		ctx.fill();
+		ctx.stroke();
+	}
+	drawEnemy = function (entity) {
+		ctx.beginPath();
+		ctx.fillStyle = entity.color;
+		ctx.fillRect(entity.x, entity.y, entity.width, entity.height);
+		ctx.fill();
+		ctx.stroke();
+	}
+
+	updatePos = function (entity) {
+
+		if (entity.x > innerWidth || entity.x < 0) {
+			entity.dx = -entity.dx;	
+		}
+
+		if (entity.y > innerHeight || entity.y < 0) {
+			entity.dy = -entity.dy;	
+		}
+	
+		entity.x += entity.dx;
+		entity.y += entity.dy;
+	}
+
+
+
+    testRectCollision = function(rect1, rect2) {
+    	return rect1.x <= rect2.x + rect2.width
+    	  	&&  rect2.x <= rect1.x + rect1.width
+    		&&  rect1.y <= rect2.y + rect2.height
+    		&&  rect2.y <= rect1.y + rect1.height ;
+    }
+
+     testCollision = function(entity1, entity2) {
+    	var rect1 = {
+    		x: entity1.x - entity1.width/2,
+    		y: entity1.y - entity2.height/2,
+    		width: entity1.width,
+    		height: entity1.height,
+    	}
+
+    	var rect2 = {
+    		x: entity2.x - entity2.width/2,
+    		y: entity2.y -  entity2.height/2,
+    		width: entity2.width,
+    		height: entity2.height,
+    	}
+    	return testRectCollision(rect1, rect2);
+     }
+
+
+
+	animate = function () {
+		ctx.clearRect(0, 0, innerWidth, innerHeight);
+		drawPlayer(player);
+
+		for(var i in enemyList){
+			update(enemyList[i]);
+			
+			var checkDeathCollision = testCollision(player, enemyList[i]);
+
+			if (checkDeathCollision) {
+				location.reload();
+				player.x = innerWidth/2;
+				player.y = innerHeight/2;
+			
+			}
+
+		}
+	}
+
+		
+
+
+	randomEnemy = function () {
+		var x = Math.random() * innerWidth;
+		var y = Math.random() * 5;
+		var dx = Math.random() * 8;
+		var dy = Math.random() * 8;
+		var id = Math.random();
+		var width = 40;
+		var height = 40;
+			
+		Enemy(x, y, dx, dy, id, width, height);
+	}
+
+for (var i = 0; i <= 35; i++) {
+	randomEnemy();
+}
+	
+
+
+setInterval(animate, 25);
+
+
+
+</script>
+</body>
+</html>
